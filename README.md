@@ -9,5 +9,10 @@ You will need to install some tools :
 apt install python-pip
 pip install s3cmd
 
-# Then copy .s3cfg to yourhome/.s3cfg
-```
+... ?
+
+tuto : 
+https://heartbeat.fritz.ai/detecting-objects-in-videos-and-camera-feeds-using-keras-opencv-and-imageai-c869fe1ebcdb
+
+yolo : 
+https://github.com/OlafenwaMoses/ImageAI/releases/download/1.0/yolo.h5
