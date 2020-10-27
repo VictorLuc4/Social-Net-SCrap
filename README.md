@@ -1,6 +1,6 @@
 # Social Net SCrap
 
-A powerful tools that use AI to detect bad stuff in videos from tiktok, instagram stories and snapchat.
+A powerful tool that use AI to detect bad stuff in videos from tiktok, instagram stories and snapchat.
 
 ## Prerequisites
 
