@@ -22,7 +22,7 @@ Env is very useful to avoid a mess on your host when installing lot of strange p
 
 ```bash
 apt update
-apt install virtual env
+apt install virtualenv
 virtualenv env -p python3
 # to activate
 source env/bin/activate
@@ -32,6 +32,8 @@ ls env/lib/
 deactivate
 ```
 
-## Scrapers
+## Install tiktok-scrapper
 
-The documentation about scrappers can be found [here](./Scrapers.md)
+```bash
+npm install -g tiktok-scraper
+```
