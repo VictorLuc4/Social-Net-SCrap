@@ -2,9 +2,12 @@
 
 A powerful tool that collect data from videos on social media.
 
-### Possible improvments
+**Possible improvments :**
 
-
+- Add a graphic cool visualisation ffor data in the DB
+- Automate db creation
+- Delete video after usage or send it to s3 
+- Reduce video quality before sending it to Google with ffmpeg
 -------
 ## Run the program
 

@@ -217,6 +217,8 @@ def google_call(videos, mycursor, mydb):
             input_content = f.read()
         # Start the asynchronous request
         print("Sending video " + video + " for analysis...")
+
+        # Maybe here we can send all the videos at the same time
         operation = client.annotate_video(
             request={
                 "features": [videointelligence.Feature.LABEL_DETECTION, videointelligence.Feature.LOGO_RECOGNITION, videointelligence.Feature.LABEL_DETECTION, videointelligence.Feature.PERSON_DETECTION, videointelligence.Feature.FACE_DETECTION, videointelligence.Feature.EXPLICIT_CONTENT_DETECTION],
@@ -225,6 +227,7 @@ def google_call(videos, mycursor, mydb):
             }
         )
         result = operation.result(timeout=90)
+
         # Retrieve the first result, because a single video was processed.
         annotation_result = result.annotation_results[0]
                 
@@ -307,14 +310,14 @@ def main():
     # retreive videos and json filesn in tabs
     (videos, jsons) = get_files(params)
     
-    # parse json/csv file
-    #parse_json(jsons, mycursor, mydb)
-    
-    # call google api with it
+    # parse json/csv file and store the result in DB
+    parse_json(jsons, mycursor, mydb)
+
+    # Add a step here to reduce the video quality ? 
+    # call google api and store result in DB
     google_call(videos, mycursor, mydb)
 
-    # get results 
-    # store results in a DB
+    # Delete video after usage ? Send it to s3 ? 
 
 
 main()
