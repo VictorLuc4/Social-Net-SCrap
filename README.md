@@ -8,6 +8,9 @@ A powerful tool that collect data from videos on social media.
 - Automate db creation
 - Delete video after usage or send it to s3 
 - Reduce video quality before sending it to Google with ffmpeg
+- Make google API calls optional
+- Add other scrapper (insta / snapchat .. ? )
+- Include tiktok-scrapper in this project 
 -------
 ## Run the program
 
@@ -32,7 +35,14 @@ python3 ./sns --hashtag <hashtag> -n 3 # will download 3 videos from #hashtag
 ```
 
 ## Setup to run the program
-## Get Google credentials json file
+
+In order to run this program you will need to : 
+* Get your google credentials (optional : needed to call google API)
+* Setup Python3 and install the requirements
+* Install tiktok-scrapper 
+* Install mysql and setup the DB
+
+### Get Google credentials json file
 
 You need to get the json file in the GCP console and add it at the root of this repository under the name `key.json`.
 
@@ -62,6 +72,7 @@ python3 -m pip install ./requirements.txt
 
 ### Install tiktok-scrapper
 
+The tiktok scrapper is a npm command you need to install : 
 ```bash
 npm install -g tiktok-scraper
 ```
