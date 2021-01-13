@@ -1,3 +1,6 @@
+# Before runnig make sure you have these tables ready :
+# Also after creating table run :
+# ALTER TABLE theme CONVERT TO CHARACTER SET utf8mb4;
 #
 # user
 # (id VARCHAR(255) PRIMARY KEY, nickname VARCHAR(255), avatar VARCHAR(1000), name VARCHAR(255), tikid VARCHAR(255), fans INT, 
@@ -16,7 +19,16 @@
 # mention (id INT PRIMARY KEY AUTO_INCREMENT, id_video VARCHAR(255), username VARCHAR(255))
 #
 # hashtag
-# hashtag (id VARCHAR(255) PRIMARY KEY, id_video VARCHAR(255), name VARCHAR(255), title VARCHAR(255), cover VARCHAR(1000))
+# hashtag (id INT PRIMARY KEY AUTO_INCREMENT, id_video VARCHAR(255), name VARCHAR(255), title VARCHAR(255), cover VARCHAR(1000))
+#
+# brand
+# brand (id_video VARCHAR(255) PRIMARY KEY, name VARCHAR(255))
+#
+# theme
+# theme (id_video VARCHAR(255) PRIMARY KEY, name VARCHAR(255))
+#
+# explicit
+# explicit (id_video VARCHAR(255) PRIMARY KEY, explicit VARCHAR(250))
 
 # - username / hashtag / number
 
@@ -26,8 +38,13 @@ import argparse
 # To retreive files from extensions :
 import glob
 import json
-
+import io
 import mysql.connector
+from google.cloud import videointelligence_v1 as videointelligence
+
+# Local import
+import detector
+
 
 def fill_args(args):
     nb = 10
@@ -173,8 +190,95 @@ def parse_json(jsons, mycursor, mydb):
         mycursor.execute(sql)
         mydb.commit()
 
-    #### NOW CALL GOOGLE API ON VIDEOS AND STORE RESULTS IN DB ####
 
+def get_video_id(video):
+    # Get video id
+    tmp = video
+    p = tmp.find('/')
+    while p != -1:
+        tmp = tmp[p+1:]
+        p = tmp.find('/')
+    idv = tmp[:len(tmp) - 4]
+    return idv
+
+
+def google_call(videos, mycursor, mydb):
+    client = videointelligence.VideoIntelligenceServiceClient()
+    config = videointelligence.types.PersonDetectionConfig(
+        include_bounding_boxes=True,
+        include_attributes=True,
+        include_pose_landmarks=True,
+    )
+    context = videointelligence.types.VideoContext(person_detection_config=config)
+
+    for video in videos:
+        # Open video
+        with io.open(video, "rb") as f:
+            input_content = f.read()
+        # Start the asynchronous request
+        print("Sending video " + video + " for analysis...")
+        operation = client.annotate_video(
+            request={
+                "features": [videointelligence.Feature.LABEL_DETECTION, videointelligence.Feature.LOGO_RECOGNITION, videointelligence.Feature.LABEL_DETECTION, videointelligence.Feature.PERSON_DETECTION, videointelligence.Feature.FACE_DETECTION, videointelligence.Feature.EXPLICIT_CONTENT_DETECTION],
+                "input_content": input_content,
+                "video_context": context,
+            }
+        )
+        result = operation.result(timeout=90)
+        # Retrieve the first result, because a single video was processed.
+        annotation_result = result.annotation_results[0]
+                
+        print("Searching for explicit content...")
+        explicit = detector.explicit(annotation_result)
+        print("Explicit = ")
+        print(explicit)
+        
+        print("Searching for logo...")
+        logos = detector.logo(annotation_result)
+        print("Logos = " )
+        print(logos)
+
+        print("Searching for theme...")
+        themes = detector.theme(annotation_result)
+        print("Themes = ")
+        print(themes)
+
+        # Saving to DB
+        ## Explicit content
+        id = get_video_id(video)
+        sql = """
+                INSERT INTO explicit (id_video, explicit) 
+                VALUES (%s, %s) ON DUPLICATE KEY UPDATE
+                explicit=%s;
+                """
+        val = (id, explicit, explicit)
+        mycursor.execute(sql, val)
+        mydb.commit()
+
+        ## Logos
+        for brand in logos:
+            sql = """
+                INSERT INTO brand (id_video, name) 
+                VALUES (%s, %s) ON DUPLICATE KEY UPDATE
+                name=%s;
+                """
+            val = (id, brand, brand)
+            mycursor.execute(sql, val)
+            mydb.commit()
+
+        ## Theme
+        for theme in themes:
+            sql = """
+                INSERT INTO theme (id_video, name) 
+                VALUES (%s, %s) ON DUPLICATE KEY UPDATE
+                name=%s;
+                """
+            val = (id, theme, theme)
+            mycursor.execute(sql, val)
+            mydb.commit()
+        
+        exit()
+        
 
 def main():
     parser = argparse.ArgumentParser()
@@ -204,8 +308,11 @@ def main():
     (videos, jsons) = get_files(params)
     
     # parse json/csv file
-    parse_json(jsons, mycursor, mydb)
+    #parse_json(jsons, mycursor, mydb)
+    
     # call google api with it
+    google_call(videos, mycursor, mydb)
+
     # get results 
     # store results in a DB
 
