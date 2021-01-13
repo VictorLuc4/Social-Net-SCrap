@@ -1,1 +1,2 @@
 google-cloud-videointelligence==2.0.0
+mysql-connector
