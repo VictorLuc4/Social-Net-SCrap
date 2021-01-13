@@ -2,9 +2,37 @@
 
 A powerful tool that collect data from videos on social media.
 
+### Possible improvments
+
+
 -------
+## Run the program
+
+Once you have setup the project with the instructions bellow, you can run the project.
+
+The program takes some time to run (download video then send it to google for inspection). 
+
+```python
+usage: sns.py [-h] [-u USER | --hashtag HASHTAG] [-n NUMBER]
+
+optional arguments:
+  -h, --help                    show this help message and exit
+  -u USER, --user USER          the username of the account you want to scrap.
+  --hashtag HASHTAG             the hashtag you want to scrap (without #).
+  -n NUMBER, --number NUMBER    the number of videos to scrap (default: 10).
+```
+
+Examples : 
+```bash
+python3 ./sns -u <username> -n 3 # will download 3 videos of <username>
+python3 ./sns --hashtag <hashtag> -n 3 # will download 3 videos from #hashtag
+```
 
 ## Setup to run the program
+## Get Google credentials json file
+
+You need to get the json file in the GCP console and add it at the root of this repository under the name `key.json`.
+
 ### Setup Python
 
 Env is very useful to avoid a mess on your host when installing lot of strange python packets.
