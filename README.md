@@ -30,8 +30,8 @@ optional arguments:
 
 Examples : 
 ```bash
-python3 ./sns -u <username> -n 3 # will download 3 videos of <username>
-python3 ./sns --hashtag <hashtag> -n 3 # will download 3 videos from #hashtag
+python3 ./sns -u <username> -n 3        # will download 3 videos of <username>
+python3 ./sns --hashtag <hashtag> -n 3  # will download 3 videos from #hashtag
 ```
 
 ## Setup to run the program
