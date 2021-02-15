@@ -40,6 +40,7 @@ In order to run this program you will need to :
 * Get your google credentials (optional : needed to call google API)
 * Do not forget to enable the API [(see this link)](https://console.developers.google.com/apis/api/videointelligence.googleapis.com/overview)
 * Setup Python3 and install the requirements
+* Install s3cmd if you want to use with --s3
 * Install tiktok-scrapper 
 * Install mysql and setup the DB
 

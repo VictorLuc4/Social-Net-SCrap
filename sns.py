@@ -52,6 +52,8 @@ def fill_args(args):
     hashtag = ""
     is_user = True
     delete = False
+    save = False
+
 
     if args.number: nb = args.number
     
@@ -63,10 +65,13 @@ def fill_args(args):
         hashtag = args.hashtag
         is_user = False
 
-    if args.delete : 
+    if args.delete == 1: 
         delete = True
 
-    return {"number":nb, "user":user, "hashtag":hashtag, "is_user":is_user, "delete":delete}
+    if args.s3 == 1:
+        save = True
+
+    return {"number":nb, "user":user, "hashtag":hashtag, "is_user":is_user, "delete":delete, "save":save}
 
 def dl_videos(p):
     one = ("user " if p["user"] != "" else "hashtag ")
@@ -319,13 +324,21 @@ def delete_jsons(jsons):
         cmd = "rm " + file
         os.system(cmd)
 
+def save_videos(videos):
+    all_videos = " ".join(videos)
+    s3_bucket_name = "s3://" + os.getenv("S3_BUCKET_NAME", "sns")
+    cmd = "s3cmd -c ./s3_config.cfg put " + all_videos + " " + s3_bucket_name
+    print("sending videos to s3 : " + s3_bucket_name)
+    os.system(cmd)
+
 def main():
     parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-u", "--user", help="the username of the account you want to scrap.")
     group.add_argument("--hashtag", help="the hashtag you want to scrap (without #).")
     parser.add_argument("-n", "--number", help="the number of videos to scrap (default: 10).", type=int)
-    parser.add_argument("-d", "--delete", help="present if you want the videos to be deleted after usage (default: not deleted)", default=1, action="count")
+    parser.add_argument("-d", "--delete", help="present if you want the videos to be deleted after usage (default: not deleted)", default=0, action="count")
+    parser.add_argument("-s", "--s3", help="if present, save to an s3, need a s3_config to be present (default: not saving", default=0, action="count")
     args = parser.parse_args()
 
     # Get arguments 
@@ -336,7 +349,9 @@ def main():
     load_dotenv()
 
     # Dl videos with tiktok-scraper
+    print("\n")
     dl_videos(params)
+    print("\n")
 
     # Setp db 
     mydb = setupDB()
@@ -344,16 +359,28 @@ def main():
 
     # retreive videos and json filesn in tabs
     (videos, jsons) = get_files(params)
-    
+
+    # Save videos if needed : 
+    print("\n")
+    if params["save"]:
+        save_videos(videos)
+    print("\n")
+
     # parse json/csv file and store the result in DB
+    print("\n")
     parse_json(jsons, mycursor, mydb)
+    print("\n")
 
     # Add a step here to reduce the video quality ? 
     # call google api and store result in DB
+    print("\n")
     google_call(videos, mycursor, mydb, params["delete"])
+    print("\n")
 
+    print("\n")
     if params["delete"] :
         delete_jsons(jsons)
+    print("\n")
 
 
 main()

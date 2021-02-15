@@ -3,3 +3,4 @@ key.json
 .DS*
 \#*
 .env
+s3_config.cfg
