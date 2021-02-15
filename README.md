@@ -38,6 +38,7 @@ python3 ./sns --hashtag <hashtag> -n 3  # will download 3 videos from #hashtag
 
 In order to run this program you will need to : 
 * Get your google credentials (optional : needed to call google API)
+* Do not forget to enable the API [(see this link)](https://console.developers.google.com/apis/api/videointelligence.googleapis.com/overview)
 * Setup Python3 and install the requirements
 * Install tiktok-scrapper 
 * Install mysql and setup the DB
@@ -88,59 +89,59 @@ mysql -u root -p
 ```
 
 To create the DB : 
-```mysql
-CREATE DATABASE sns
-use sns
+```sql
+CREATE DATABASE sns;
+use sns;
+```
+
+You will need to store the db information in a `.env` file : 
+```bash
+SNS_DB_HOST="127.0.0.1"
+SNS_DB_USER="sns"
+SNS_DB_PASS="yourpass"
+SNS_DB_NAME="sns"
+SNS_DB_PORT=3306
 ```
 
 Then you will need to create all the tables : 
 
 #### Create user table : 
-```
+```sql
+-- User
 CREATE TABLE user (id VARCHAR(255) PRIMARY KEY, nickname VARCHAR(255), avatar VARCHAR(1000), name VARCHAR(255), tikid VARCHAR(255), fans INT, secuid VARCHAR(255), signature VARCHAR(1000), digg INT, verified TINYINT, video INT, heart INT, following INT);
 
 ALTER TABLE user CONVERT TO CHARACTER SET utf8mb4;
-```
 
-#### Create music table : 
-```
-CREATE TABLE music (id VARCHAR(50) PRIMARY KEY, musicName VARCHAR(255), duration INT, playUrl VARCHAR(500), 
-musicOriginal TINYINT, coverUrl VARCHAR(500), musicAlbum VARCHAR(255), musicAuthor VARCHAR(255));
+--  Music
+CREATE TABLE music (id VARCHAR(50) PRIMARY KEY, musicName VARCHAR(255), duration INT, playUrl VARCHAR(500), musicOriginal TINYINT, coverUrl VARCHAR(500), musicAlbum VARCHAR(255), musicAuthor VARCHAR(255));
 
 ALTER TABLE music CONVERT TO CHARACTER SET utf8mb4;
-```
 
-#### Create video table : 
-```
-video (id VARCHAR(50) PRIMARY KEY, userId VARCHAR(255), shareCount INT, commentCount INT, playCount INT, videoUrl VARCHAR(1000), text VARCHAR(1000), coverDynamic VARCHAR(1000), createTime VARCHAR(255), secretID VARCHAR(255), webVideoUrl VARCHAR(1000), diggCount INT, height INT, width INT, duration INT);
+-- Video
+CREATE TABLE video (id VARCHAR(50) PRIMARY KEY, userId VARCHAR(255), shareCount INT, commentCount INT, playCount INT, videoUrl VARCHAR(1000), text VARCHAR(1000), coverDynamic VARCHAR(1000), createTime VARCHAR(255), secretID VARCHAR(255), webVideoUrl VARCHAR(1000), diggCount INT, height INT, width INT, duration INT);
 
 ALTER TABLE video CONVERT TO CHARACTER SET utf8mb4;
-```
 
-#### Create mention table : 
-
-```
+-- Mention
 CREATE TABLE mention (id INT PRIMARY KEY AUTO_INCREMENT, id_video VARCHAR(255), username VARCHAR(255));
 
 ALTER TABLE mention CONVERT TO CHARACTER SET utf8mb4;
-```
 
-#### Create hashtag table : 
-```
+-- Hashtag
 CREATE TABLE hashtag (id INT PRIMARY KEY AUTO_INCREMENT, id_video VARCHAR(255), name VARCHAR(255), title VARCHAR(255), cover VARCHAR(1000));
 
 ALTER TABLE hashtag CONVERT TO CHARACTER SET utf8mb4;
-```
 
-#### Create theme table : 
-```
+-- Brand
+CREATE TABLE brand (id_video VARCHAR(255) PRIMARY KEY, name VARCHAR(255));
+ALTER TABLE brand CONVERT TO CHARACTER SET utf8mb4;
+
+-- Theme
 CREATE TABLE theme (id_video VARCHAR(255) PRIMARY KEY, name VARCHAR(255));
 
 ALTER TABLE theme CONVERT TO CHARACTER SET utf8mb4;
-```
 
-#### Create explicit table : 
-```
+-- explicit
 CREATE TABLE explicit (id_video VARCHAR(255) PRIMARY KEY, explicit VARCHAR(250));
 
 ALTER TABLE explicit CONVERT TO CHARACTER SET utf8mb4;

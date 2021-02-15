@@ -51,6 +51,7 @@ def fill_args(args):
     user = ""
     hashtag = ""
     is_user = True
+    delete = False
 
     if args.number: nb = args.number
     
@@ -61,7 +62,11 @@ def fill_args(args):
     if args.hashtag and args.hashtag != "":
         hashtag = args.hashtag
         is_user = False
-    return {"number":nb, "user":user, "hashtag":hashtag, "is_user":is_user}
+
+    if args.delete : 
+        delete = True
+
+    return {"number":nb, "user":user, "hashtag":hashtag, "is_user":is_user, "delete":delete}
 
 def dl_videos(p):
     one = ("user " if p["user"] != "" else "hashtag ")
@@ -69,7 +74,7 @@ def dl_videos(p):
     three = str(p["number"])
     cmd = "tiktok-scraper " + one + two + " -n " + three + " -d -t json"
     print(cmd)
-    #os.system(cmd)
+    os.system(cmd)
     
 def get_files(p):
     dirname = (p["user"] if p["user"] != "" else "/#"+p["hashtag"])
@@ -202,7 +207,13 @@ def get_video_id(video):
     return idv
 
 
-def google_call(videos, mycursor, mydb):
+def delete_video(video):
+    print("Deleting : " + video)
+    cmd = "rm " + video
+    os.system(cmd)
+    
+
+def google_call(videos, mycursor, mydb, should_delete):
     client = videointelligence.VideoIntelligenceServiceClient()
     config = videointelligence.types.PersonDetectionConfig(
         include_bounding_boxes=True,
@@ -280,8 +291,33 @@ def google_call(videos, mycursor, mydb):
             mycursor.execute(sql, val)
             mydb.commit()
         
-        exit()
+        delete_video(video)
         
+
+def setupDB():
+    db_host = os.getenv('SNS_DB_HOST', 'localhost')
+    db_port = os.getenv('SNS_DB_PORT', 3306)
+    db_user = os.getenv('SNS_DB_USER', 'root')
+    db_pass = os.getenv('SNS_DB_PASS', '')
+    db_name = os.getenv('SNS_DB_NAME', 'sns')
+
+    mydb = mysql.connector.connect(
+        host = db_host,
+        user = db_user,
+        port = db_port,
+        password = db_pass,
+        database = db_name,
+        charset = 'utf8mb4'
+    )
+    return mydb
+
+
+def delete_jsons(jsons):
+    print("Deleting : ")
+    for file in jsons:
+        print("- " + file)
+        cmd = "rm " + file
+        os.system(cmd)
 
 def main():
     parser = argparse.ArgumentParser()
@@ -289,22 +325,21 @@ def main():
     group.add_argument("-u", "--user", help="the username of the account you want to scrap.")
     group.add_argument("--hashtag", help="the hashtag you want to scrap (without #).")
     parser.add_argument("-n", "--number", help="the number of videos to scrap (default: 10).", type=int)
+    parser.add_argument("-d", "--delete", help="present if you want the videos to be deleted after usage (default: not deleted)", default=1, action="count")
     args = parser.parse_args()
 
     # Get arguments 
     params = fill_args(args)
-    
+
+    # env config can be in a .env file
+    from dotenv import load_dotenv
+    load_dotenv()
+
     # Dl videos with tiktok-scraper
     dl_videos(params)
 
     # Setp db 
-    mydb = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="sns",
-        charset='utf8mb4'
-    )
+    mydb = setupDB()
     mycursor = mydb.cursor()
 
     # retreive videos and json filesn in tabs
@@ -315,9 +350,10 @@ def main():
 
     # Add a step here to reduce the video quality ? 
     # call google api and store result in DB
-    google_call(videos, mycursor, mydb)
+    google_call(videos, mycursor, mydb, params["delete"])
 
-    # Delete video after usage ? Send it to s3 ? 
+    if params["delete"] :
+        delete_jsons(jsons)
 
 
 main()

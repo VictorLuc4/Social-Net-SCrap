@@ -2,3 +2,4 @@ video*
 key.json
 .DS*
 \#*
+.env
