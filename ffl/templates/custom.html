@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Search result for : {{ info.nickname }} </h1>
+<div class="wrapper">
+    <h3>Basic informations : </h3>
+    <div>
+        <p>
+        Username : {{ info.nickname }} </br>
+        Real name : {{ info.name }}
+        </p>
+    </div>
+    <div>
+        <p>
+        {{ info.nickname }} signature is : </br>
+        {{ info.signature }}
+        </p>
+    </div>
+    <div>
+        <p>
+        {% if info.verified == 1 %}
+        {{ info.nickname }} is verified
+        {% else %}
+        {{ info.nickname }} is not verified
+        {% endif %}
+        </p>
+    </div>
+    <div>
+        <p>
+        Following {{ info.following }} people </br>
+        Has {{ info.video }} videos but only {{ vidinfo.videoNum }} were scrapped and analyzed</br>
+        Has {{ info.fans }} fans </br>
+        Has a total of {{ info.heart }} hearts </br>
+        </p>
+    </div>
+    <h3>From the video analized we found the informations below :</h3>
+    <div>
+        <p>
+            A video duration average of {{ vidinfo.duration_av }} seconds </br>
+            An average of {{ vidinfo.share_av }} shares, {{ vidinfo.comments_av}} comments and {{vidinfo.plays_av }} plays per video. </br>
+            The average size of the description is {{ vidinfo.descSize_av }}
+        </p>
+    </div>
+    <hr>
+    <div>
+        Top 10 brands that appears in its videos (chart)
+    </div>
+    <div>
+        Explicit Pie
+    </div>
+    <div>
+        Top 10 list of most explicit videos (list of url)
+    </div>
+    <div>
+        Top 10 people mentionned
+    </div>
+    <div>
+        Top 10 hashtag used
+    </div>
+    <div>
+        Top 10 viewed videos with explicit - brand - hashtag - mention associated (in a table ?)
+    </div>
+
+    <div>
+        <canvas id="prefposttime" width="800" height="500"></canvas></br>
+    </div>
+</div>
+
+<script>
+    videoData = {{ vidinfo|tojson }}
+</script>
+<script src="/static/userCharts.js"></script>
+{% endblock %}
