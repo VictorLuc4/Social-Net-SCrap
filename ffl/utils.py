@@ -70,5 +70,4 @@ def getBubbleFromDaysAndHours(days, hours):
         for x, z in val.items():
             bub.append({'x':x, 'y':y, 'r':z*5})
 
-    print(bub)
     return bub

@@ -11,13 +11,18 @@ import utils
 from form import searchform
 
 from dotenv import load_dotenv
+
+app = Flask(__name__)
+SECRET_KEY = os.urandom(32)
+app.config['SECRET_KEY'] = SECRET_KEY
+
 load_dotenv()
 
 db_host = os.getenv('SNS_DB_HOST', '127.0.0.1')
 db_port = os.getenv('SNS_DB_PORT', 3630)
-db_user = os.getenv('SNS_DB_USER', '...')
-db_pass = os.getenv('SNS_DB_PASS', '...')
-db_name = os.getenv('SNS_DB_NAME', '...')
+db_user = os.getenv('SNS_DB_USER', 'toto')
+db_pass = os.getenv('SNS_DB_PASS', 'toto.')
+db_name = os.getenv('SNS_DB_NAME', 'toto')
 
 mydb = mysql.connector.connect(
     host = db_host,
@@ -30,9 +35,7 @@ mydb = mysql.connector.connect(
 
 cursor = mydb.cursor()
 
-SECRET_KEY = os.urandom(32)
-app = Flask(__name__)
-app.config['SECRET_KEY'] = SECRET_KEY
+
 
 @app.route("/", methods=['GET', 'POST'])
 def chart():
@@ -80,4 +83,9 @@ def custom(name="N/A"):
     userInfo = sqlquery.getUserInfo(cursor, name)
     videos = sqlquery.getUserVideos(cursor, name)
     videosInfo = utils.computeVideosInfo(videos)
-    return render_template('custom.html', form=searchForm, info=userInfo, vidinfo=videosInfo)
+    explicits = sqlquery.getExplicitVideoUrlFromUser(cursor, name)
+    hashtags = sqlquery.getHashtagsCountForUser(cursor, name)
+    mentions = sqlquery.getMentionsFromUser(cursor, name)
+    brands = sqlquery.getBrandsCountForUser(cursor, name)
+    return render_template('custom.html', form=searchForm, info=userInfo, vidinfo=videosInfo, \
+                            explicits=explicits, hashtags=hashtags, mentions=mentions, brands=brands)

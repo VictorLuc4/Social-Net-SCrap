@@ -8,6 +8,9 @@
 # import datetime
 # datetime.datetime.fromtimestamp(1549634152).strftime('%c')
 
+# Get user specific by item
+# SELECT name FROM user INNER JOIN video INNER JOIN explicit WHERE explicit.explicit='LIKELY' AND explicit.id_video=video.id AND video.userId=user.id;
+
 # Get top 10 brand and count
 def getTop10BrandByCount(cursor):
     cursor.execute("select name, count(*) from brand group by name limit 10;")
@@ -56,3 +59,57 @@ def getUserVideos(cursor, name):
         zipped = zip(field_names, item)
         final_res.append(dict(zipped))
     return final_res
+
+# Get all the explicit videos for a specific user
+def getExplicitVideoUrlFromUser(cursor, name):
+    cursor.execute("""  \
+                    select webVideoUrl, explicit from video join explicit inner join user  \
+                    WHERE user.name=%s and video.userId=user.id and video.id=explicit.id_video \
+                    and (explicit.explicit='VERY_LIKELY' or explicit.explicit='LIKELY' or explicit.explicit='POSSIBLE');
+                    """, (name,)) # or explicit.explicit='POSSIBLE'
+    results = cursor.fetchall()
+    results = dict(results)
+    if results == {}:
+        return {'N/A':'N/A'}
+    return results
+
+# Get all the hashtag and the count for a specific user
+def getHashtagsCountForUser(cursor, name):
+    cursor.execute("""  \
+                    select hashtag.name, count(*) from hashtag inner join video inner join user where \
+                    user.id=video.userId and hashtag.id_video=video.id and user.name=%s \
+                    group by hashtag.name; \
+                    """, (name,))
+    results = cursor.fetchall()
+    results = dict(results)
+    if results == {}:
+        return {'N/A':'N/A'}
+    return results
+
+# Get all mentions count for a specific user
+def getMentionsFromUser(cursor, name):
+    cursor.execute("""\
+                    select username, count(*) from mention inner join video inner join user \
+                    where user.id=video.userId and mention.id_video=video.id and user.name=%s \
+                    group by username; \
+                    """, (name,))
+    results = cursor.fetchall()
+    results = dict(results)
+    if results == {}:
+        return {'N/A':'N/A'}
+    return results
+
+
+# get all brand count that appears for a users
+def getBrandsCountForUser(cursor, name):
+    cursor.execute("""\
+                    select brand.name, count(*) from brand inner join video inner join user \
+                    where user.id=video.userId and brand.id_video=video.id and user.name=%s \
+                    group by brand.name; \
+                    """, (name,))
+
+    results = cursor.fetchall()
+    results = dict(results)
+    if results == {}:
+        return {'N/A':'N/A'}
+    return results
