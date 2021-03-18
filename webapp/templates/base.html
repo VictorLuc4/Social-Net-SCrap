@@ -1,0 +1,24 @@
+<html>
+    <head>
+      {% if title %}
+      <title>{{ title }}</title>
+      {% else %}
+      <title>Welcome to SNS</title>
+      {% endif %}
+      <script src='/static/Chart.min.js'></script>
+      <script src="/static/utils.js"></script>
+
+    </head>
+    <body>
+        <div>
+            <a href="/"> General overview </a>
+        </div>
+        <form method="POST" action="/">
+            {{ form.csrf_token }}
+            {{ form.search.label }} {{ form.search(size=55) }}
+            <input type="submit" value="Go">
+        </form>
+        <hr>
+        {% block content %}{% endblock %}
+    </body>
+</html>

@@ -18,11 +18,11 @@ app.config['SECRET_KEY'] = SECRET_KEY
 
 load_dotenv()
 
-db_host = os.getenv('SNS_DB_HOST', '195.154.70.120')
-db_port = os.getenv('SNS_DB_PORT', 22417)
-db_user = os.getenv('SNS_DB_USER', 'sns')
-db_pass = os.getenv('SNS_DB_PASS', 'Tutulapraline123.')
-db_name = os.getenv('SNS_DB_NAME', 'sns')
+db_host = os.getenv('SNS_DB_HOST', '127.0.0.1')
+db_port = os.getenv('SNS_DB_PORT', 3630)
+db_user = os.getenv('SNS_DB_USER', 'toto')
+db_pass = os.getenv('SNS_DB_PASS', 'toto')
+db_name = os.getenv('SNS_DB_NAME', 'toto')
 
 mydb = mysql.connector.connect(
     host = db_host,
