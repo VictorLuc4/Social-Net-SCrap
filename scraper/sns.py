@@ -302,7 +302,7 @@ def google_call(videos, mycursor, mydb, should_delete):
 
 def setupDB():
     db_host = os.getenv('SNS_DB_HOST', '127.0.0.1')
-    db_port = os.getenv('SNS_DB_PORT', 3630)
+    db_port = os.getenv('SNS_DB_PORT', 3630) 
     db_user = os.getenv('SNS_DB_USER', 'toto')
     db_pass = os.getenv('SNS_DB_PASS', 'toto')
     db_name = os.getenv('SNS_DB_NAME', 'toto')
