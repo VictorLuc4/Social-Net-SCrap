@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="/static/table.css">
+
+<h1>Search result for : {{ info.nickname }} </h1>
+<div class="wrapper">
+    <h3>Basic informations : </h3>
+    <div>
+        <p>
+        Username : {{ info.nickname }} </br>
+        Real name : {{ info.name }}
+        </p>
+    </div>
+    <div>
+        <p>
+        {{ info.nickname }} signature is : </br>
+        {{ info.signature }}
+        </p>
+    </div>
+    <div>
+        <p>
+        {% if info.verified == 1 %}
+        {{ info.nickname }} is verified
+        {% else %}
+        {{ info.nickname }} is not verified
+        {% endif %}
+        </p>
+    </div>
+    <div>
+        <p>
+        Following {{ info.following }} people </br>
+        Has {{ info.video }} videos but only {{ vidinfo.videoNum }} were scrapped and analyzed</br>
+        Has {{ info.fans }} fans </br>
+        Has a total of {{ info.heart }} hearts </br>
+        </p>
+    </div>
+    <h3>From the video analized we found the informations below :</h3>
+    <div>
+        <p>
+            A video duration average of {{ vidinfo.duration_av }} seconds </br>
+            An average of {{ vidinfo.share_av }} shares, {{ vidinfo.comments_av}} comments and {{vidinfo.plays_av }} plays per video. </br>
+            The average size of the description is {{ vidinfo.descSize_av }}
+        </p>
+    </div>
+    <div>
+        <h3>Brands that appears in the videos :</h3>
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Brands</th>
+                    <th>Number of time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, value in brands.items() %}
+                <tr>
+                    <td>{{key}}</td>
+                    <td>{{value}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <h3>Videos with possible explicit content :</h3>
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Video Url</th>
+                    <th>Explicit Video</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, value in explicits.items() %}
+                <tr>
+                    {% if value == 'N/A' %}
+                        <td>{{key}}</td>
+                    {% else %}
+                        <td><a href="{{key}}" target="_blank" rel="noopener noreferrer">{{key}}</a></td>
+                    {% endif %}
+                    <td>{{ value }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <h3>People mentionned in the videos : </h3>
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Mentionned</th>
+                    <th>Number of time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, value in mentions.items() %}
+                <tr>
+                    {% if value == 'N/A' %}
+                    <td>{{key}}</td>
+                    {% else %}
+                    <td><a href="https://www.tiktok.com/{{key}}" target="_blank" rel="noopener noreferrer">{{key}}</a></td>
+                    {% endif %}
+                    <td>{{value}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <h3>Hashtags used in the videos : </h3>
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Hashtags</th>
+                    <th>Number of time used</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, value in hashtags.items() %}
+                <tr>
+                    <td>{{key}}</td>
+                    <td>{{ value }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div>
+        <h3>Posts map regarding the days and the hours : </h3>
+        <canvas id="prefposttime" width="800" height="500"></canvas></br>
+    </div>
+</div>
+
+<script>
+    videoData = {{ vidinfo|tojson }}
+</script>
+<script src="/static/userCharts.js"></script>
+{% endblock %}

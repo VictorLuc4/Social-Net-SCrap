@@ -40,6 +40,7 @@ import glob
 import json
 import io
 import mysql.connector
+import asyncio
 from google.cloud import videointelligence_v1 as videointelligence
 
 # Local import
@@ -83,7 +84,7 @@ def dl_videos(p):
     
 def get_files(p):
     dirname = (p["user"] if p["user"] != "" else "/#"+p["hashtag"])
-    pwd = os.getcwd() + dirname
+    pwd = "./" + dirname
     search_for_videos = pwd + "/*.mp4"
     search_for_json = pwd + "/*.json"
     videos = glob.glob(search_for_videos)
@@ -92,6 +93,9 @@ def get_files(p):
 
 
 def parse_json(jsons, mycursor, mydb):
+    if len(jsons) == 0:
+        print("No video found... Quitting")
+        exit(84)
     file = jsons[0]
     with open(file, 'r') as f:
         data = json.load(f)
@@ -218,7 +222,8 @@ def delete_video(video):
     os.system(cmd)
     
 
-def google_call(videos, mycursor, mydb, should_delete):
+
+def google_single_video(video, mycursor, mydb):
     client = videointelligence.VideoIntelligenceServiceClient()
     config = videointelligence.types.PersonDetectionConfig(
         include_bounding_boxes=True,
@@ -227,84 +232,80 @@ def google_call(videos, mycursor, mydb, should_delete):
     )
     context = videointelligence.types.VideoContext(person_detection_config=config)
 
-    for video in videos:
-        # Open video
-        with io.open(video, "rb") as f:
-            input_content = f.read()
-        # Start the asynchronous request
-        print("Sending video " + video + " for analysis...")
+    # Open video
+    with io.open(video, "rb") as f:
+        input_content = f.read()
+    # Start the asynchronous request
+    print("Sending video " + video + " for analysis...")
 
-        # Maybe here we can send all the videos at the same time
-        operation = client.annotate_video(
-            request={
-                "features": [videointelligence.Feature.LABEL_DETECTION, videointelligence.Feature.LOGO_RECOGNITION, videointelligence.Feature.LABEL_DETECTION, videointelligence.Feature.PERSON_DETECTION, videointelligence.Feature.FACE_DETECTION, videointelligence.Feature.EXPLICIT_CONTENT_DETECTION],
-                "input_content": input_content,
-                "video_context": context,
-            }
-        )
-        result = operation.result(timeout=90)
+    # Maybe here we can send all the videos at the same time
+    operation = client.annotate_video(
+        request={
+            "features": [videointelligence.Feature.LABEL_DETECTION, videointelligence.Feature.LOGO_RECOGNITION, videointelligence.Feature.LABEL_DETECTION, videointelligence.Feature.PERSON_DETECTION, videointelligence.Feature.FACE_DETECTION, videointelligence.Feature.EXPLICIT_CONTENT_DETECTION],
+            "input_content": input_content,
+            "video_context": context,
+        }
+    )
+    result = operation.result(timeout=90)
 
-        # Retrieve the first result, because a single video was processed.
-        annotation_result = result.annotation_results[0]
-                
-        print("Searching for explicit content...")
-        explicit = detector.explicit(annotation_result)
-        print("Explicit = ")
-        print(explicit)
-        
-        print("Searching for logo...")
-        logos = detector.logo(annotation_result)
-        print("Logos = " )
-        print(logos)
+    # Retrieve the first result, because a single video was processed.
+    annotation_result = result.annotation_results[0]
+            
+    print("Searching for explicit content...")
+    explicit = detector.explicit(annotation_result)
+    
+    print("Searching for logo...")
+    logos = detector.logo(annotation_result)
 
-        print("Searching for theme...")
-        themes = detector.theme(annotation_result)
-        print("Themes = ")
-        print(themes)
+    print("Searching for theme...")
+    themes = detector.theme(annotation_result)
 
-        # Saving to DB
-        ## Explicit content
-        id = get_video_id(video)
+    # Saving to DB
+    ## Explicit content
+    id = get_video_id(video)
+    sql = """
+            INSERT INTO explicit (id_video, explicit) 
+            VALUES (%s, %s) ON DUPLICATE KEY UPDATE
+            explicit=%s;
+            """
+    val = (id, explicit, explicit)
+    mycursor.execute(sql, val)
+    mydb.commit()
+
+    ## Logos
+    for brand in logos:
         sql = """
-                INSERT INTO explicit (id_video, explicit) 
-                VALUES (%s, %s) ON DUPLICATE KEY UPDATE
-                explicit=%s;
-                """
-        val = (id, explicit, explicit)
+            INSERT INTO brand (id_video, name) 
+            VALUES (%s, %s) ON DUPLICATE KEY UPDATE
+            name=%s;
+            """
+        val = (id, brand, brand)
         mycursor.execute(sql, val)
         mydb.commit()
 
-        ## Logos
-        for brand in logos:
-            sql = """
-                INSERT INTO brand (id_video, name) 
-                VALUES (%s, %s) ON DUPLICATE KEY UPDATE
-                name=%s;
-                """
-            val = (id, brand, brand)
-            mycursor.execute(sql, val)
-            mydb.commit()
+    ## Theme
+    for theme in themes:
+        sql = """
+            INSERT INTO theme (id_video, name) 
+            VALUES (%s, %s) ON DUPLICATE KEY UPDATE
+            name=%s;
+            """
+        val = (id, theme, theme)
+        mycursor.execute(sql, val)
+        mydb.commit()
+    
+    delete_video(video)
 
-        ## Theme
-        for theme in themes:
-            sql = """
-                INSERT INTO theme (id_video, name) 
-                VALUES (%s, %s) ON DUPLICATE KEY UPDATE
-                name=%s;
-                """
-            val = (id, theme, theme)
-            mycursor.execute(sql, val)
-            mydb.commit()
-        
-        delete_video(video)
-        
+def google_call(videos, mycursor, mydb, should_delete):
+    for video in videos:
+        google_single_video(video, mycursor, mydb)
 
 def setupDB():
-    db_host = os.getenv('SNS_DB_HOST', 'localhost')
-    db_port = os.getenv('SNS_DB_PORT', 3306)
-    db_user = os.getenv('SNS_DB_USER', 'root')
-    db_pass = os.getenv('SNS_DB_PASS', '')
-    db_name = os.getenv('SNS_DB_NAME', 'sns')
+    db_host = os.getenv('SNS_DB_HOST', '127.0.0.1')
+    db_port = os.getenv('SNS_DB_PORT', 3630) 
+    db_user = os.getenv('SNS_DB_USER', 'toto')
+    db_pass = os.getenv('SNS_DB_PASS', 'toto')
+    db_name = os.getenv('SNS_DB_NAME', 'toto')
 
     mydb = mysql.connector.connect(
         host = db_host,
@@ -349,38 +350,26 @@ def main():
     load_dotenv()
 
     # Dl videos with tiktok-scraper
-    print("\n")
     dl_videos(params)
-    print("\n")
-
-    # Setp db 
-    mydb = setupDB()
-    mycursor = mydb.cursor()
 
     # retreive videos and json filesn in tabs
     (videos, jsons) = get_files(params)
 
     # Save videos if needed : 
-    print("\n")
     if params["save"]:
         save_videos(videos)
-    print("\n")
 
     # parse json/csv file and store the result in DB
-    print("\n")
     parse_json(jsons, mycursor, mydb)
-    print("\n")
 
     # Add a step here to reduce the video quality ? 
     # call google api and store result in DB
-    print("\n")
     google_call(videos, mycursor, mydb, params["delete"])
-    print("\n")
 
-    print("\n")
     if params["delete"] :
         delete_jsons(jsons)
-    print("\n")
 
-
+# Setp db 
+mydb = setupDB()
+mycursor = mydb.cursor()
 main()

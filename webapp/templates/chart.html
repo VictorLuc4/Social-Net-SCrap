@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="/static/styles.css">
+
+<h1>General Overview</h1>
+<!-- bar chart canvas element -->
+<div class="wrapper">
+    <div id="content">
+        <canvas id="top10UsersByVideoCount" width="500" height="500"></canvas>
+    </div>
+
+    <div id="content">
+    <canvas id="explicitCountByCategory" width="500" height="500"></canvas>
+    </div>
+
+    <div id="content">
+    <canvas id="top10BrandByCount" width="500" height="500"></canvas>
+    </div>
+</div>
+
+<p id="caption">The chart is displaying a simple line chart.</p>
+
+
+<script>
+
+    top10User = {{ charts.top10User|tojson }}
+    explicitCountData = {{ charts.explicitCount|tojson }}
+    top10Brand = {{ charts.top10Brand|tojson }}
+
+</script>
+<script src="static/customCharts.js"></script>
+{% endblock %}
