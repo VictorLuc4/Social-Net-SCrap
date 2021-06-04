@@ -1,3 +1,5 @@
+#!/bin/python3
+
 # Before runnig make sure you have these tables ready :
 # Also after creating table run :
 # ALTER TABLE theme CONVERT TO CHARACTER SET utf8mb4;
@@ -307,6 +309,8 @@ def setupDB():
     db_pass = os.getenv('SNS_DB_PASS', 'toto')
     db_name = os.getenv('SNS_DB_NAME', 'toto')
 
+    print(db_host)
+
     mydb = mysql.connector.connect(
         host = db_host,
         user = db_user,
@@ -343,11 +347,7 @@ def main():
     args = parser.parse_args()
 
     # Get arguments 
-    params = fill_args(args)
-
-    # env config can be in a .env file
-    from dotenv import load_dotenv
-    load_dotenv()
+    params = fill_args(args)   
 
     # Dl videos with tiktok-scraper
     dl_videos(params)
@@ -369,7 +369,14 @@ def main():
     if params["delete"] :
         delete_jsons(jsons)
 
-# Setp db 
+
+# Setp db from env conf
+# env config can be in a .env file
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv()) 
+
 mydb = setupDB()
 mycursor = mydb.cursor()
+
+# start the program
 main()
