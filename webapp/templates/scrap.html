@@ -1,6 +1,16 @@
 {% extends "head.html" %}
 
 {% block content %}
-<h1>Let's scrap some people...</h1>
+<h1>Let'scrap some people...</h1>
+
+<form method="POST" action="/scrap">
+    {{ scrapForm.csrf_token }}
+    {{ scrapForm.radio }}
+    Username or hashtag to scrap :</br>
+    {{ scrapForm.data(placeholder="usershtag") }} </br></br>
+    Number of video to scrap from 1 to 20 : </br>
+    {{ scrapForm.number(placeholder="3") }}</br></br>
+    <input type="submit">
+</form>
 
 {% endblock %}

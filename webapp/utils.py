@@ -1,3 +1,8 @@
+def launchScrapper(scrapData):
+    print(scrapData)
+    # run scrapper
+    return 
+
 
 def computeVideosInfo(videos):
     import datetime
