@@ -6,7 +6,7 @@
 categoryColors = getColorsForTab(explicitCountData.values, 0.35)
 
 var explicitCountByCategory = document.getElementById("explicitCountByCategory").getContext("2d");
-    //Chart.defaults.global.responsive = false;
+    Chart.defaults.global.responsive = false;
 
 var explicitCountByCategoryChart = new Chart(explicitCountByCategory, {
     type: 'doughnut',

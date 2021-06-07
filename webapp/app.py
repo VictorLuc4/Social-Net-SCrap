@@ -66,7 +66,7 @@ def chart():
                         'values':count, \
                         'legend':'Number of video per category'}
 
-    return render_template('chart.html', charts=charts, title="SNS", form=searchForm)
+    return render_template('base.html', charts=charts, title="SNS", form=searchForm)
  
 
 @app.route('/search/<item>')
@@ -89,3 +89,9 @@ def custom(name="N/A"):
     brands = sqlquery.getBrandsCountForUser(cursor, name)
     return render_template('custom.html', form=searchForm, info=userInfo, vidinfo=videosInfo, \
                             explicits=explicits, hashtags=hashtags, mentions=mentions, brands=brands)
+
+
+@app.route('/scrap')
+def scrap():
+    searchForm = searchform()
+    return render_template('scrap.html', form=searchForm)

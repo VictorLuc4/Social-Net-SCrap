@@ -16,18 +16,19 @@
 
     </head>
     <body >
-        <div class="hero-image">
+        <div class="hero-image-head">
             <div class="hero-text">
-                <img src="/static/logo-full.png" width="400" height="auto">
-                <h2><a href="/" style="text-decoration: none; color:#000000;"> Research </a> | <a href="/scrap" style="text-decoration: none; color:#000000;"> Scrap </a></h2>
+                <h2><a href="/" style="color:#000000;"> Research </a> | <a href="/scrap" style="color:#000000;"> Scrap </a></h2>
                 <p>Not just another OSINT tool</p>
-                <form method="POST" action="/" class="example" style="margin:auto;max-width:500px">
+                <form method="POST" action="/" class="example" style="margin:auto;max-width:300px">
                     {{ form.csrf_token }}
                     {{ form.search(placeholder="Search user..") }}
                     <button type="submit"><i class="fa fa-search"></i></button>
                 </form>
             </div>
           </div>
-        {% block content %}{% endblock %}
+        <div class="general">
+            {% block content %}{% endblock %}
+        </div>
     </body>
 </html>
