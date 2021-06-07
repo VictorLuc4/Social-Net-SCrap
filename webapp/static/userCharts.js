@@ -13,7 +13,7 @@ var prefposttimeChart = new Chart(prefposttime, {
             {
                 label: 'Posts',
                 data: videoData.bubble,
-                backgroundColor: "rgba(153,255,51,0.6)"
+                backgroundColor: "rgba(134,196,236, 0.6)"
             },
         ]
     },

@@ -101,6 +101,7 @@ def scrap():
                     'data':request.form.get('data'), \
                     'number':request.form.get('number')}
         utils.launchScrapper(scrapData)
+        return redirect(url_for('chart'))
 
     return render_template('scrap.html', form=searchF, scrapForm=scrapF)
 

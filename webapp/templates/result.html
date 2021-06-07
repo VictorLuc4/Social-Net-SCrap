@@ -1,19 +1,29 @@
 {% extends "head.html" %}
 
 {% block content %}
+<div style="float:center">
 <h1>Results found for "{{ item }}" </h1>
-<table style="width:50%">
-    <tr>
-      <th>Nickname</th>
-      <th>Real Name</th> 
-    </tr>
-    {% for dict_item in users %}
-    <tr>
-        {% for key, value in dict_item.items() %}
-            <td style="text-align:center;"><a href="/custom/{{value}}">{{key}}</a></td>
-            <td style="text-align:center;">{{value}}</td>
-        {% endfor %}
-    </tr>
-    {% endfor %}
-</table>
+
+    <link rel="stylesheet" href="/static/table.css">
+
+    <table class="styled-res" >
+        <thead>
+            <tr>
+                <th>Nickname</th>
+                <th>Real Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dict_item in users %}
+            <tr>
+                {% for key, value in dict_item.items() %}
+                <td style="text-align:center;"><a href="/custom/{{value}}">{{key}}</a></td>
+                <td style="text-align:center;">{{value}}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 {% endblock %}
