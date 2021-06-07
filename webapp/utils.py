@@ -1,6 +1,10 @@
+import os
+
 def launchScrapper(scrapData):
     print(scrapData)
-    # run scrapper
+    cmd = "python3 scraper/sns.py --" + scrapData['radio'] + " " + scrapData['data'] +"  -n " + scrapData['number']
+    print(cmd)
+    os.system(cmd)
     return 
 
 
