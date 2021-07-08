@@ -1,3 +1,12 @@
+import os
+
+def launchScrapper(scrapData):
+    print(scrapData)
+    cmd = "python3 scraper/sns.py --" + scrapData['radio'] + " " + scrapData['data'] +"  -n " + scrapData['number']
+    print(cmd)
+    os.system(cmd)
+    return 
+
 
 def computeVideosInfo(videos):
     import datetime

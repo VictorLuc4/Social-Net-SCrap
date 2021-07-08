@@ -1,3 +1,5 @@
+python-dotenv
+flask-wtf
+flask
 google-cloud-videointelligence==2.0.0
 mysql-connector
-python-dotenv

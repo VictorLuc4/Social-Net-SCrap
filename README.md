@@ -79,6 +79,10 @@ The tiktok scrapper is a npm command you need to install :
 npm install -g tiktok-scraper
 ```
 
+If it is not working try the solution at this link :
+https://github.com/drawrowfly/tiktok-scraper/pull/563#issuecomment-852264427
+
+
 ### Install mysql if not done already
 
 ```bash

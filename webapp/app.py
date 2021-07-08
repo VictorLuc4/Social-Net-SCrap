@@ -8,7 +8,7 @@ import mysql.connector
 import sqlquery
 import utils 
 
-from form import searchform
+from form import searchform, scrapform
 
 from dotenv import load_dotenv
 
@@ -39,9 +39,9 @@ cursor = mydb.cursor()
 
 @app.route("/", methods=['GET', 'POST'])
 def chart():
-    searchForm = searchform()
+    searchF = searchform()
     
-    if searchForm.validate():
+    if searchF.validate():
         return redirect(url_for('search', item=request.form.get('search')))
 
     ## get top 10 users
@@ -66,20 +66,20 @@ def chart():
                         'values':count, \
                         'legend':'Number of video per category'}
 
-    return render_template('chart.html', charts=charts, title="SNS", form=searchForm)
+    return render_template('base.html', charts=charts, title="SNS", form=searchF)
  
 
 @app.route('/search/<item>')
 def search(item="N/A"):
-    searchForm = searchform()
+    searchF = searchform()
     print(item)
     users = sqlquery.searchFromBaseUsername(cursor, item)
-    return render_template('result.html', form=searchForm,  item=item, users=users)
+    return render_template('result.html', form=searchF,  item=item, users=users)
 
 
 @app.route('/custom/<name>')
 def custom(name="N/A"):
-    searchForm = searchform()
+    searchF = searchform()
     userInfo = sqlquery.getUserInfo(cursor, name)
     videos = sqlquery.getUserVideos(cursor, name)
     videosInfo = utils.computeVideosInfo(videos)
@@ -87,5 +87,21 @@ def custom(name="N/A"):
     hashtags = sqlquery.getHashtagsCountForUser(cursor, name)
     mentions = sqlquery.getMentionsFromUser(cursor, name)
     brands = sqlquery.getBrandsCountForUser(cursor, name)
-    return render_template('custom.html', form=searchForm, info=userInfo, vidinfo=videosInfo, \
+    return render_template('custom.html', form=searchF, info=userInfo, vidinfo=videosInfo, \
                             explicits=explicits, hashtags=hashtags, mentions=mentions, brands=brands)
+
+
+@app.route('/scrap', methods=['GET', 'POST'])
+def scrap():
+    searchF = searchform()
+    scrapF =scrapform()
+
+    if scrapF.validate_on_submit():
+        scrapData = {'radio':request.form.get('radio'), \
+                    'data':request.form.get('data'), \
+                    'number':request.form.get('number')}
+        utils.launchScrapper(scrapData)
+        return redirect(url_for('chart'))
+
+    return render_template('scrap.html', form=searchF, scrapForm=scrapF)
+

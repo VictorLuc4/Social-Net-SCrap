@@ -1,0 +1,21 @@
+{% extends "head.html" %}
+
+{% block content %}
+
+<form method="POST" class="scrapform" action="/scrap" style="margin:auto;max-width:500px">
+    {{ scrapForm.csrf_token }}
+    <h1>Let'scrap some people...</h1>
+    </br>
+    Scrap a user or a hashtag ? </br>
+    {{ scrapForm.radio }} </br>
+    Username or hashtag to scrap :</br>
+    {{ scrapForm.data(placeholder="usershtag") }} </br></br>
+    Number of video to scrap from 1 to 20 : </br>
+    {{ scrapForm.number(placeholder="3") }}</br></br>
+    <button type="submit" ><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
+    <div id="breakline" hidden="true">
+        Please wait for the page to reload. It can take up to 5 minutes. Take a break, and a coffee !
+    </div>
+</form>
+
+{% endblock %}

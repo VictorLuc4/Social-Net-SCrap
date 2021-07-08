@@ -8,7 +8,7 @@
 }
 
 .styled-table thead tr {
-    background-color: #009879;
+    background-color: #86C4ECFF;
     color: #ffffff;
     text-align: left;
 }
@@ -31,13 +31,63 @@ thead, tbody tr {
 }
 
 .styled-table tbody tr {
-    border-bottom: 1px solid #dddddd;
+    border-bottom: 1px solid #8fedbf30;
 }
 
 .styled-table tbody tr:nth-of-type(even) {
-    background-color: #f3f3f3;
+    background-color: #86C4EC30;
 }
 
 .styled-table tbody tr:last-of-type {
-    border-bottom: 2px solid #009879;
+    border-bottom: 2px solid #38a2e0a2;
+}
+
+/* ---- results ----*/
+
+.styled-res {
+    border-collapse: collapse;
+    margin: 10 0;
+    padding-left: 40px;
+    padding-right: 40px;
+    font-size: 0.9em;
+    font-family: sans-serif;
+    height: auto;
+    width: auto;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.styled-res thead tr {
+    background-color: #86C4ECFF;
+    color: #000000;
+    text-align: center;
+}
+
+.styled-res th,
+.styled-res td {
+    padding: 12px 15px;
+}
+
+tbody {
+    display: block;
+    overflow: auto;
+    max-height: 100%;
+}
+
+thead, tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.styled-res tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.styled-res tbody tr:nth-of-type(even) {
+    background-color: #86C4EC30;
+}
+
+
+.styled-res tbody tr:last-of-type {
+    border-bottom: 2px solid #38a2e0a2;
 }
