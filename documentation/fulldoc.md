@@ -2,7 +2,7 @@
 
 Social Net SCrap (later called SNS) is an Open Source Intelligence (OSINT) tool, that collect data and metada from videos on social medias from users' profile.
 
-This document is here to list the full documentation of the project.
+This document is here to list the full documentation of the project!
 
 ## Summary
 
